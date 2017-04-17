@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="entrar">Enter</string>
+    <string name="voltar">Return</string>
+    <string name="vers_o_1_0">Version 1.0</string>
+    <string name="action_settings">Settings</string>
+    <string name="app_name">Car</string>
+    <string name="car_veiculos_gmail_com">car</string>
+    <string name="navigation_drawer_close">Close Navigation</string>
+    <string name="navigation_drawer_open">Open Navigation</string>
+</resources>
