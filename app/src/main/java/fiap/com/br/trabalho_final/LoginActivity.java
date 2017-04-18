@@ -1,6 +1,5 @@
 package fiap.com.br.trabalho_final;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,15 +20,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import fiap.com.br.trabalho_final.model.Usuario;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private final String LOGIN_DEFAULT = "android";
-    private final String SENHA_DEFAULT = "mobile";
+    private static String LOGIN_DEFAULT = "adm";
+    private static String SENHA_DEFAULT = "123";
     public static final String KEY_APP_PREFERENCES = "login";
     public static final String KEY_LOGIN = "login";
     private TextInputLayout tilLogin;
@@ -45,6 +39,8 @@ public class LoginActivity extends AppCompatActivity {
         tilLogin = (TextInputLayout) findViewById(R.id.tilLogin);
         tilSenha = (TextInputLayout) findViewById(R.id.tilSenha);
         cbManterConectado = (CheckBox) findViewById(R.id.cbManterConectado);
+
+        new BuscaDados().execute("http://www.mocky.io/v2/58b9b1740f0000b614f09d2f");
 
         if (isConectado()) {
             iniciarApp();
@@ -101,54 +97,39 @@ public class LoginActivity extends AppCompatActivity {
 
     private class BuscaDados extends AsyncTask<String, Void, String> {
 
-        ProgressDialog pdLoading;
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pdLoading = new ProgressDialog(LoginActivity.this);
-            pdLoading.setMessage("Carregando os Dados");
-            pdLoading.show();
         }
 
         @Override
         protected String doInBackground(String... params) {
 
-            try {
-
+            try{
                 URL url = new URL(params[0]);
-
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
                 conn.setReadTimeout(15000);
                 conn.setConnectTimeout(10000);
-
                 conn.setRequestMethod("GET");
-
                 conn.setDoOutput(true);
-
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-
+                if(conn.getResponseCode() == HttpURLConnection.HTTP_OK){
                     InputStream is = conn.getInputStream();
-
                     BufferedReader buffer = new BufferedReader(new InputStreamReader(is));
 
                     StringBuilder result = new StringBuilder();
-
                     String linha;
 
-                    while ((linha = buffer.readLine()) != null) {
+                    while((linha = buffer.readLine()) != null){
                         result.append(linha);
                     }
                     conn.disconnect();
                     return result.toString();
 
                 }
-
-            } catch (MalformedURLException e) {
-
+            } catch (MalformedURLException e){
+                e.printStackTrace();
             } catch (IOException e) {
-
+                e.printStackTrace();
             }
 
             return null;
@@ -156,43 +137,19 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            //super.onPostExecute(s);
-
-            if (s == null) {
-
-                Toast.makeText(LoginActivity.this, "Deu ruim!", Toast.LENGTH_SHORT).show();
+            if(s == null){
+                Toast.makeText(LoginActivity.this, "Deu ruim!", Toast.LENGTH_LONG).show();
             } else {
                 try {
                     JSONObject json = new JSONObject(s);
-                    JSONArray jsonArray = json.getJSONArray("android");
-
-                    List<Usuario> lista = new ArrayList<>();
-
-                    for(int i=0; i< jsonArray.length(); i++) {
-
-                        JSONObject data = jsonArray.getJSONObject(i);
-
-                        Usuario usuario = new Usuario();
-
-                        usuario.setLogin(data.getString("usuario"));
-                        usuario.setSenha(data.getString("senha"));
-
-
-                        lista.add(usuario);
-
-                    }
-
-
-
+                  LOGIN_DEFAULT =  json.getString("usuario");
+                  SENHA_DEFAULT =  json.getString("senha");
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            pdLoading.dismiss();
         }
     }
-
-
 
 }
